@@ -3,7 +3,7 @@ import sbt.Keys._
 
 object SpraySolrBuild extends Build {
 
-  lazy val csiService = Project(
+  lazy val spraySolr = Project(
     id = "spray-solr",
     base = file("."),
     settings = Project.defaultSettings ++ Seq(
