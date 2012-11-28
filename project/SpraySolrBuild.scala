@@ -9,9 +9,12 @@ object SpraySolrBuild extends Build {
     settings = Project.defaultSettings ++ Seq(
       name := "Spray Solr",
       organization := "io.spray",
+      organizationHomepage := Some(new URL("http://spray.io")),
       homepage := Some(new URL("https://github.com/Bathtor/spray-solr")),
       description := "A simple Solr DSL for Scala and Spray",
       version := "0.2-SNAPSHOT",
+      startYear := Some(2012),
+      licenses := Seq("Apache 2" -> new URL("http://www.apache.org/licenses/LICENSE-2.0.txt")),
       scalaVersion := "2.10.0-RC2",
       scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-language:postfixOps", "-language:implicitConversions"),
       resolvers += "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases",
