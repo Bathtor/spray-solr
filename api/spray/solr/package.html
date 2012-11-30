@@ -48,7 +48,9 @@
 <a href="http://spray.io/documentation/spray-client/" target="_blank">spray-client</a>
 and <a href="http://github.com/spray/spray-json" target="_blank">spray-json</a>.</p><h4>Basic Flow</h4><ul><li>Construct query using the <a href="Solr.html" class="extype" name="spray.solr.Solr">spray.solr.Solr</a> object,</li><li>send the query to the (running) <a href="SolrService.html" class="extype" name="spray.solr.SolrService">spray.solr.SolrService</a> actor,</li><li>handle the resulting SolrServiceResponse by providing an implicit JsonFormat.</li></ul><h4>Example</h4><h5>Setup</h5><p>Create SolrService actor:</p><pre><span class="kw">val</span> solrService = system.actorOf(
 	props = Props[SolrService],
-	name = <span class="lit">"solr-service"</span>);</pre><h5>Query</h5><p>Create query &quot;http://localhost:8983/solr/core1/select?q=test&amp;wt=json&amp;rows=10&quot; with:</p><pre><span class="kw">val</span> solrQuery = Solr(<span class="lit">"localhost"</span>, <span class="num">8983</span>, <span class="lit">"core1"</span>).q(<span class="lit">"test"</span>).rows(<span class="num">10</span>)()</pre><p>or if you have com.typesafe.config.Config config file with something like</p><pre>test.solr {
+	name = <span class="lit">"solr-service"</span>);</pre><p>Don't forget that you need to have a spray-client
+running at <b>context.actorFor(&quot;../http-client&quot;)</b>
+(relative to the context of the SolrService).</p><h5>Query</h5><p>Create query &quot;http://localhost:8983/solr/core1/select?q=test&amp;wt=json&amp;rows=10&quot; with:</p><pre><span class="kw">val</span> solrQuery = Solr(<span class="lit">"localhost"</span>, <span class="num">8983</span>, <span class="lit">"core1"</span>).q(<span class="lit">"test"</span>).rows(<span class="num">10</span>)()</pre><p>or if you have com.typesafe.config.Config config file with something like</p><pre>test.solr {
 	ip = <span class="lit">"localhost"</span>
  	port = <span class="num">8983</span>
  	core = <span class="lit">"/solr/core1"</span>
