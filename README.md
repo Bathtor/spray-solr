@@ -2,7 +2,7 @@ _spray-solr_ is a simple Solr DSL for [Scala] and [Spray].
 
 ### Installation
 
-There is no repo for spray-solr, yet.
+There is no repo for _spray-solr_, yet.
 So just build it yourself from the sources here.
 If you want to build it as part of another [Scala] project add:
 
@@ -40,7 +40,7 @@ and an akka.actor.ActorSystem with that config in scope:
 
 	val solrQuery = Solr("test.solr").q("test").rows(10)()
 
-Then send the request off to the SolrService instance (let's say we have it in scope in '''solrService''') and remember the the future (if doing ask):
+Then send the request off to the SolrService instance (let's say we have it in scope in `solrService`) and remember the the future (if doing ask):
 
 	val solrResponseFuture = solrService ? solrQuery
 
@@ -48,7 +48,7 @@ Now say you expect the response from Solr to have two fields test1 and test2 wit
 
 	case class SolrTestResult(val test1: String, val test2: String)
 
-You need to get a spray-json formatter for SolrTestResult into scope.
+You need to get a _spray-json_ formatter for SolrTestResult into scope.
 You can find out how to do that in the [SprayJson] documentation.
 
 One you have that you can get the list of results:
@@ -71,7 +71,7 @@ You can find the scaladoc for _spray-solr_ here:
 
 _spray-solr_ is licensed under [APL 2.0].
 
-	[APL 2.0]: http://www.apache.org/licenses/LICENSE-2.0
-	[Scala]: http://www.scala-lang.org/
-	[Spray]: http://spray.io/
-	[SprayJson]: http://github.com/spray/spray-json
+   [APL 2.0]: http://www.apache.org/licenses/LICENSE-2.0
+   [Scala]: http://www.scala-lang.org/
+   [Spray]: http://spray.io/
+   [SprayJson]: http://github.com/spray/spray-json
