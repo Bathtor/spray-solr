@@ -1,0 +1,332 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>solr - spray.solr</title>
+          <meta name="description" content="solr - spray.solr" />
+          <meta name="keywords" content="solr spray.solr" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'spray.solr.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img src="../../lib/package_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="spray">spray</a></p>
+        <h1>solr</h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">solr</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Provides a simple Solr DSL using <a href="http://akka.io/" target="_blank">Akka</a>,
+<a href="http://spray.io/documentation/spray-client/" target="_blank">spray-client</a>
+and <a href="http://github.com/spray/spray-json" target="_blank">spray-json</a>.</p><h4>Basic Flow</h4><ul><li>Construct query using the <a href="Solr.html" class="extype" name="spray.solr.Solr">spray.solr.Solr</a> object,</li><li>send the query to the (running) <a href="SolrService.html" class="extype" name="spray.solr.SolrService">spray.solr.SolrService</a> actor,</li><li>handle the resulting SolrServiceResponse by providing an implicit JsonFormat.</li></ul><h4>Example</h4><h5>Setup</h5><p>Create SolrService actor:</p><pre><span class="kw">val</span> solrService = system.actorOf(
+	props = Props[SolrService],
+	name = <span class="lit">"solr-service"</span>);</pre><h5>Query</h5><p>Create query &quot;http://localhost:8983/solr/core1/select?q=test&amp;wt=json&amp;rows=10&quot; with:</p><pre><span class="kw">val</span> solrQuery = Solr(<span class="lit">"localhost"</span>, <span class="num">8983</span>, <span class="lit">"core1"</span>).q(<span class="lit">"test"</span>).rows(<span class="num">10</span>)()</pre><p>or if you have com.typesafe.config.Config config file with something like</p><pre>test.solr {
+	ip = <span class="lit">"localhost"</span>
+ 	port = <span class="num">8983</span>
+ 	core = <span class="lit">"/solr/core1"</span>
+}</pre><p>and an akka.actor.ActorSystem with that config in scope:</p><pre><span class="kw">val</span> solrQuery = Solr(<span class="lit">"test.solr"</span>).q(<span class="lit">"test"</span>).rows(<span class="num">10</span>)()</pre><p>Then send the request off to the SolrService instance
+(let's say we have it in scope in <b>solrService</b>)
+and remember the the future (if doing ask):</p><pre><span class="kw">val</span> solrResponseFuture = solrService ? solrQuery</pre><p>Now say you expect the response from Solr to have
+two fields test1 and test2 with string values and
+you want those end up in a nice case class like:</p><pre><span class="kw">case</span> <span class="kw">class</span> SolrTestResult(<span class="kw">val</span> test1: <span class="std">String</span>, <span class="kw">val</span> test2: <span class="std">String</span>)</pre><p>You need to get a spray-json formatter for SolrTestResult into scope.
+You can find out how to do that in the <a href="http://github.com/spray/spray-json" target="_blank">spray-json documentation</a>.</p><p>One you have that you can get the list of results:</p><pre>solrResponseFuture onSuccess {
+	<span class="kw">case</span> solrResponse: SolrResults <span class="kw">=&gt;</span> {
+		<span class="kw">val</span> testResults: <span class="std">List</span>[SolrTestResult] = solrResponse.as[SolrTestResult]
+		<span class="cmt">// do something with the results</span>
+	}
+	<span class="kw">case</span> SolrError <span class="kw">=&gt;</span> {
+		<span class="cmt">// handle the error</span>
+ }
+}</pre></div><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="spray.solr"><span>solr</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="spray.solr.EmptyReply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="EmptyReply[T]extendsSolrResponse[T]withProductwithSerializable"></a>
+      <a id="EmptyReply[T]:EmptyReply[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="EmptyReply.html"><span class="name">EmptyReply</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="error">error: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="SolrResponse.html" class="extype" name="spray.solr.SolrResponse">SolrResponse</a>[<span class="extype" name="spray.solr.EmptyReply.T">T</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="spray.solr.Response" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Response[T]extendsProductwithSerializable"></a>
+      <a id="Response[T]:Response[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Response.html"><span class="name">Response</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="numFound">numFound: <span class="extype" name="scala.Int">Int</span></span>, <span name="start">start: <span class="extype" name="scala.Int">Int</span></span>, <span name="docs">docs: <span class="extype" name="scala.List">List</span>[<span class="extype" name="spray.solr.Response.T">T</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="spray.solr.ResponseHeader" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ResponseHeaderextendsProductwithSerializable"></a>
+      <a id="ResponseHeader:ResponseHeader"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="ResponseHeader.html"><span class="name">ResponseHeader</span></a><span class="params">(<span name="status">status: <span class="extype" name="scala.Int">Int</span></span>, <span name="QTime">QTime: <span class="extype" name="scala.Int">Int</span></span>, <span name="params">params: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="spray.solr.Solr" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SolrextendsObject"></a>
+      <a id="Solr:Solr"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Solr.html"><span class="name">Solr</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Constructs a Solr query.</p>
+    </li><li name="spray.solr.SolrImport" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SolrImportextendsObject"></a>
+      <a id="SolrImport:SolrImport"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SolrImport.html"><span class="name">SolrImport</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Constructs a Solr dataimport query.</p>
+    </li><li name="spray.solr.SolrQuery" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SolrQueryextendsProductwithSerializable"></a>
+      <a id="SolrQuery:SolrQuery"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="SolrQuery.html"><span class="name">SolrQuery</span></a><span class="params">(<span name="host">host: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="port">port: <span class="extype" name="scala.Int">Int</span></span>, <span name="content">content: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="spray.solr.SolrReply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SolrReply[T]extendsSolrResponse[T]withProductwithSerializable"></a>
+      <a id="SolrReply[T]:SolrReply[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="SolrReply.html"><span class="name">SolrReply</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="responseHeader">responseHeader: <a href="ResponseHeader.html" class="extype" name="spray.solr.ResponseHeader">ResponseHeader</a></span>, <span name="response">response: <a href="Response.html" class="extype" name="spray.solr.Response">Response</a>[<span class="extype" name="spray.solr.SolrReply.T">T</span>]</span>)</span><span class="result"> extends <a href="SolrResponse.html" class="extype" name="spray.solr.SolrResponse">SolrResponse</a>[<span class="extype" name="spray.solr.SolrReply.T">T</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="spray.solr.SolrResponse" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="SolrResponse[T]extendsObject"></a>
+      <a id="SolrResponse[T]:SolrResponse[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SolrResponse.html"><span class="name">SolrResponse</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="spray.solr.SolrResults" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SolrResultsextendsSolrServiceResponsewithProductwithSerializable"></a>
+      <a id="SolrResults:SolrResults"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="SolrResults.html"><span class="name">SolrResults</span></a><span class="params">(<span name="response">response: <span class="extype" name="spray.http.HttpEntity">HttpEntity</span></span>)</span><span class="result"> extends <a href="SolrServiceResponse.html" class="extype" name="spray.solr.SolrServiceResponse">SolrServiceResponse</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="spray.solr.SolrService" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SolrServiceextendsActorwithActorLogging"></a>
+      <a id="SolrService:SolrService"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SolrService.html"><span class="name">SolrService</span></a><span class="result"> extends <span class="extype" name="akka.actor.Actor">Actor</span> with <span class="extype" name="akka.actor.ActorLogging">ActorLogging</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="spray.solr.SolrServiceResponse" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="SolrServiceResponseextendsObject"></a>
+      <a id="SolrServiceResponse:SolrServiceResponse"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SolrServiceResponse.html"><span class="name">SolrServiceResponse</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="spray.solr.Solr" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Solr"></a>
+      <a id="Solr:Solr"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Solr$.html"><span class="name">Solr</span></a>
+      </span>
+      </h4>
+      <p class="comment cmt">Factory for Solr query builders
+</p>
+    </li><li name="spray.solr.SolrError" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SolrError"></a>
+      <a id="SolrError:SolrError"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SolrError$.html"><span class="name">SolrError</span></a><span class="result"> extends <a href="SolrServiceResponse.html" class="extype" name="spray.solr.SolrServiceResponse">SolrServiceResponse</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="spray.solr.SolrJsonProtocol" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SolrJsonProtocol"></a>
+      <a id="SolrJsonProtocol:SolrJsonProtocol"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SolrJsonProtocol$.html"><span class="name">SolrJsonProtocol</span></a><span class="result"> extends <span class="extype" name="spray.json.DefaultJsonProtocol">DefaultJsonProtocol</span></span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
