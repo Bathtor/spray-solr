@@ -22,14 +22,24 @@ import java.net.URLEncoder
 import com.typesafe.config.Config
 import akka.actor.ActorSystem
 
-
-class Solr(val host: String, val port: Int, val db: String) {
+/**
+ * Constructs a Solr query.
+ * 
+ * Method names correspond to Solr url parameters.
+ * See [[http://wiki.apache.org/solr/SolrQuerySyntax]] for Solr usage.
+ */
+class Solr(val host: String, val port: Int, val core: String) {
 	
-	var query = "*:*";
-	var fields = "";
-	val wt = "json";
-	var start = 0;
-	var rows = 5;
+	private var query = "*:*";
+	private var fields = "";
+	private val wt = "json";
+	private var start = 0;
+	private var rows = 5;
+	
+	/**
+	 * Gives a data-import url instead of a select url.
+	 */
+	def dataimport: SolrImport = new SolrImport(host, port, core)
 	
 	def q(str: String): Solr = {
 		query = str;
@@ -55,17 +65,17 @@ class Solr(val host: String, val port: Int, val db: String) {
 		return this;
 	}
 	
-	//def apply()(implicit format: JsonFormat[String]) = apply[String];
-	
+	/**
+	 * Constructs query that can be send to SolrService
+	 */
 	def apply(): SolrQuery = {
 		val url = constructQuery();
-		//println("Sending Query " + url + " to SolrService");
 		return SolrQuery(host, port, url);
 	}
 	
 	private def constructQuery(): String = {
 		val b: StringBuilder = new StringBuilder();
-		b ++= db;
+		b ++= core;
 		b ++= "/select?";
 		b ++= "q="+URLEncoder.encode(query, "UTF-8");
 		b ++= "&wt="+URLEncoder.encode(wt, "UTF-8");
@@ -77,18 +87,104 @@ class Solr(val host: String, val port: Int, val db: String) {
 	}
 }
 
-object Solr {
-	def apply(host: String, port: Int, collection: String): Solr = {
-		return new Solr(host, port, collection);
+/**
+ * Constructs a Solr dataimport query.
+ * Allows to decide between full-import and delta-import
+ * and specify values for clean, commit and optimise flags.
+ */
+class SolrImport(val host: String, val port: Int, val core: String) {
+	private var deltaImport = false
+	private var cleanFlag = true;
+	private var commitFlag = true;
+	private var optimiseFlag = false;
+	
+	def full: SolrImport = {
+		deltaImport = false;
+		return this;
 	}
 	
+	def delta: SolrImport = {
+		deltaImport = true;
+		return this;
+	}
+	
+	def clean(flag: Boolean): SolrImport = {
+		cleanFlag = flag;
+		return this;
+	}	
+	def clean: SolrImport = clean(true);
+	def noClean: SolrImport = clean(false);
+	
+	def commit(flag: Boolean): SolrImport = {
+		commitFlag = flag;
+		return this;
+	}
+	def commit: SolrImport = commit(true);
+	def noCommit: SolrImport = commit(false);
+	
+	def optimise(flag: Boolean): SolrImport = {
+		optimiseFlag = flag;
+		return this;
+	}
+	def optimise: SolrImport = optimise(true);
+	def noOptimise: SolrImport = optimise(false);
+	// For American nerds -.-
+	def optimize: SolrImport = optimise(true);
+	def noOptimize: SolrImport = optimise(false);
+	
+	/**
+	 * Constructs query that can be send to SolrService
+	 */
+	def apply(): SolrQuery = {
+		val url = constructQuery();
+		return SolrQuery(host, port, url);
+	}
+	
+	private def constructQuery(): String = {
+		val b: StringBuilder = new StringBuilder();
+		b ++= core;
+		b ++= "/dataimport?";
+		b ++= "command=" + (if(deltaImport) "delta-import" else "full-import");
+		b ++= "&clean="+cleanFlag;
+		b ++= "&commit="+commitFlag;
+		b ++= "&optimize="+optimiseFlag; //remember that Solr has american spelling
+		
+		return b.result;
+	}
+}
+
+/**
+ * Factory for Solr query builders
+ */
+object Solr {
+	
+	/**
+	 * Wraps the constructor of [[spray.solr.Solr]]
+	 */
+	def apply(host: String, port: Int, core: String): Solr = {
+		return new Solr(host, port, core);
+	}
+	
+	/**
+	 * Fetches data for building a [[spray.solr.Solr]] instance 
+	 * from the provided typesafe config file.
+	 * 
+	 * Values <path>.ip, <path>.port and <path>.core must be present.
+	 * 
+	 * @param path the path inside the config file in standard '.'-Form (e.g. "spray.solr.host")
+	 * @param config the config file to look up values in
+	 */
 	def apply(path: String, config: Config): Solr = {
 		val ip = config.getString(path+".ip");
 		val port = config.getInt(path+".port");
-		val collection = config.getString(path+".collection");
-		return apply(ip, port, collection);
+		val core = config.getString(path+".core");
+		return apply(ip, port, core);
 	}
 	
+	/**
+	 * Acquires the config file for {@code Solr(path, config)} from the 
+	 * implicit ActorSystem as in {@code system.settings.config}
+	 */
 	def apply(path: String)(implicit system: ActorSystem): Solr = {
 		return apply(path, system.settings.config);
 	}
