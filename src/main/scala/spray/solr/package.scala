@@ -24,6 +24,10 @@ import akka.actor.ActorSystem
  *		name = "solr-service");
  * }}}
  * 
+ * Don't forget that you need to have a spray-client 
+ * running at '''context.actorFor("../http-client")'''
+ * (relative to the context of the SolrService).
+ * 
  * ===Query===
  * Create query "http://localhost:8983/solr/core1/select?q=test&wt=json&rows=10" with:
  * {{{
