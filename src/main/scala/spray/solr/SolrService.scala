@@ -17,15 +17,16 @@
 package spray.solr
 
 import akka.actor.Actor
-import spray.can.client.{ HttpDialog, HttpClient }
 import spray.http._
-//import scala.concurrent._
-import scala.util.{Success, Failure}
+import spray.client.HttpConduit
+import scala.util.{ Success, Failure }
 import akka.event.Logging
 import akka.actor.ActorLogging
 import spray.json._
 import spray.util._
 import akka.pattern.ask
+import akka.actor.ActorRef
+import akka.actor.Props
 
 abstract class SolrResponse[T];
 case class SolrReply[T](responseHeader: ResponseHeader, response: Response[T]) extends SolrResponse[T]
@@ -46,7 +47,7 @@ abstract class SolrServiceResponse {
 case class SolrQuery(host: String, port: Int, content: String)
 case class SolrResults(response: HttpEntity) extends SolrServiceResponse {
 	import SolrJsonProtocol._
-	
+
 	override def as[T]()(implicit format: JsonFormat[T]): List[T] = {
 
 		//println("Solr got SolrService response: " + response.asString);
@@ -66,12 +67,17 @@ class SolrService extends Actor with ActorLogging {
 
 	val httpClient = context.actorFor("../http-client");
 
+	var conduitCache = Map.empty[String, ActorRef];
+
 	def receive = {
 		case SolrQuery(host, port, content) => {
 			//println("Sending HTTP request to Solr...");
-			val responseFuture = HttpDialog(httpClient, host, port)
-				.send(HttpRequest(uri = content))
-				.end;
+//			val responseFuture = HttpDialog(httpClient, host, port)
+//				.send(HttpRequest(uri = content))
+//				.end;
+			val conduit = lookupConduit(host, port);
+			val pipeline = HttpConduit.sendReceive(conduit);
+			val responseFuture = pipeline(HttpRequest(method = HttpMethods.GET, uri = content));
 			val replyTo = sender;
 			responseFuture onComplete {
 				case Success(response) => {
@@ -83,6 +89,19 @@ class SolrService extends Actor with ActorLogging {
 					replyTo ! SolrError;
 				}
 			}
+		}
+	}
+
+	private def lookupConduit(host: String, port: Int): ActorRef = {
+		val key = host + ":" + port;
+		if (conduitCache contains key) {
+			return conduitCache(key);
+		} else {
+			val conduit = context.actorOf(
+				props = Props(new HttpConduit(httpClient, host, port)),
+				name = "http-conduit-" + key);
+			conduitCache += (key -> conduit);
+			return conduit;
 		}
 	}
 }
