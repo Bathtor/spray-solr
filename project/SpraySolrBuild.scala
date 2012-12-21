@@ -15,20 +15,20 @@ object SpraySolrBuild extends Build {
       version := "0.2-SNAPSHOT",
       startYear := Some(2012),
       licenses := Seq("Apache 2" -> new URL("http://www.apache.org/licenses/LICENSE-2.0.txt")),
-      scalaVersion := "2.10.0-RC3",
+      scalaVersion := "2.10.0-RC5",
       scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-language:postfixOps", "-language:implicitConversions"),
       resolvers += "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases",
       resolvers += "spray repo" at "http://repo.spray.io",
       resolvers += "nightly spray" at "http://nightlies.spray.io",
       resolvers += "sonatype releases"  at "https://oss.sonatype.org/content/repositories/releases/",
       resolvers += "sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/",
-      libraryDependencies += "com.typesafe.akka" % "akka-actor_2.10.0-RC3" % "2.1.0-RC3",
-      libraryDependencies += "com.typesafe.akka" %   "akka-slf4j_2.10.0-RC3" % "2.1.0-RC3",
+      libraryDependencies += "com.typesafe.akka" % "akka-actor_2.10.0-RC5" % "2.1.0-RC5",
+      libraryDependencies += "com.typesafe.akka" %   "akka-slf4j_2.10.0-RC5" % "2.1.0-RC5",
       libraryDependencies += "org.scalatest" %%  "scalatest" % "1.8-B1" cross CrossVersion.full,
       libraryDependencies += "org.slf4j" % "slf4j-simple" % "1.6.6",
       libraryDependencies += "io.spray" %% "spray-json" % "1.2.3" cross CrossVersion.full,
-      libraryDependencies += "io.spray" % "spray-can" % "1.1-20121208", // change back after lazy system init issue is merged into a milestone
-      libraryDependencies += "io.spray" % "spray-client" % "1.1-20121208"
+      libraryDependencies += "io.spray" % "spray-can" % "1.1-M7",
+      libraryDependencies += "io.spray" % "spray-client" % "1.1-M7"
     )
   ) 
 }

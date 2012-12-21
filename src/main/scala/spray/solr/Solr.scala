@@ -98,6 +98,8 @@ class SolrImport(val host: String, val port: Int, val core: String) {
 	private var commitFlag = true;
 	private var optimiseFlag = false;
 	
+	private val wt = "json";
+	
 	def full: SolrImport = {
 		deltaImport = false;
 		return this;
@@ -147,7 +149,8 @@ class SolrImport(val host: String, val port: Int, val core: String) {
 		b ++= "command=" + (if(deltaImport) "delta-import" else "full-import");
 		b ++= "&clean="+cleanFlag;
 		b ++= "&commit="+commitFlag;
-		b ++= "&optimize="+optimiseFlag; //remember that Solr has american spelling
+		b ++= "&optimize="+optimiseFlag; //remember that Solr has AE spelling
+		b ++= "&wt="+URLEncoder.encode(wt, "UTF-8");
 		
 		return b.result;
 	}

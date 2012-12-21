@@ -63,6 +63,16 @@ One you have that you can get the list of results:
 		}
 	}
 
+#### DataImport
+
+If you need to trigger data-import from inside your application logic you can do so the same way as you send queries, and simply replace the `solrQuery` from above with:
+
+	val solrQuery = Solr("test.solr").dataimport.full.clean.commit.optimise()
+
+or simply (and equivalently in this case)
+
+	val solrQuery = Solr("test.solr").dataimport()
+
 ### API Documentation
 You can find the scaladoc for _spray-solr_ here:
 <http://bathtor.github.com/spray-solr/api>
