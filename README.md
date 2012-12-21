@@ -53,7 +53,7 @@ You can find out how to do that in the [SprayJson] documentation.
 
 One you have that you can get the list of results:
 
-	olrResponseFuture onSuccess {
+	solrResponseFuture onSuccess {
 		case solrResponse: SolrResults => {
 			val testResults: List[SolrTestResult] = solrResponse.as[SolrTestResult]
 			// do something with the results
